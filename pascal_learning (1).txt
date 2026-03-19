@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Блез Паскаль — Цифровой учебный ресурс</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=IM+Fell+English:ital@0;1&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --parchment: #f5edd8;
+    --parchment-dark: #e8d9b8;
+    --sepia: #8b6914;
+    --sepia-light: #c49a2a;
+    --rust: #8b3a1a;
+    --rust-light: #c0512a;
+    --teal: #1a4a4a;
+    --teal-light: #2a7a7a;
+    --gold: #c49a2a;
+    --shadow: rgba(26,18,8,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Crimson Pro', Georgia, serif;
+    background-color: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Parchment texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.6;
+  }
+
+  /* ===== NAVIGATION ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--ink);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    border-bottom: 2px solid var(--gold);
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    color: var(--gold);
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--parchment-dark);
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem;
+    padding: 0.3rem 0.9rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .nav-btn:hover, .nav-btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 2rem 4rem;
+    position: relative;
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 40%, #e8d4a8 0%, var(--parchment) 70%);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--sepia), var(--gold), transparent);
+  }
+
+  .hero-ornament {
+    font-size: 2rem;
+    color: var(--sepia-light);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--sepia);
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 0.95;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  .hero-subtitle {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--sepia);
+    margin: 1.2rem 0 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.5s forwards;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--rust);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--sepia);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .hero-divider {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--sepia), transparent);
+    margin: 0 auto 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.65s forwards;
+  }
+
+  .start-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--rust);
+    color: var(--parchment);
+    border: none;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.1rem;
+    padding: 0.8rem 2.2rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.25s;
+    position: relative;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.75s forwards;
+  }
+
+  .start-btn::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 1px solid var(--gold);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .start-btn:hover {
+    background: var(--rust-light);
+    transform: translateY(-2px);
+  }
+
+  .start-btn:hover::before { opacity: 1; }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    display: none;
+    min-height: 100vh;
+    padding: 80px 2rem 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section.active { display: block; }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .section-label {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--sepia);
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  .section-title em { color: var(--rust); font-style: italic; }
+
+  /* ===== TIMELINE ===== */
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--sepia) 10%, var(--sepia) 90%, transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: slideIn 0.5s ease forwards;
+  }
+
+  .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+  .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+  .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+  .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+  .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+  .timeline-item:nth-child(6) { animation-delay: 0.6s; }
+  .timeline-item:nth-child(7) { animation-delay: 0.7s; }
+  .timeline-item:nth-child(8) { animation-delay: 0.8s; }
+  .timeline-item:nth-child(9) { animation-delay: 0.9s; }
+
+  .timeline-dot {
+    position: absolute;
+    left: -2.45rem;
+    top: 0.35rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--parchment);
+    border: 2px solid var(--sepia);
+    transition: all 0.3s;
+  }
+
+  .timeline-item:hover .timeline-dot {
+    background: var(--rust);
+    border-color: var(--rust);
+    transform: scale(1.3);
+  }
+
+  .timeline-year {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--rust);
+    margin-bottom: 0.3rem;
+  }
+
+  .timeline-event {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+
+  .timeline-desc {
+    font-size: 0.95rem;
+    color: #4a3a1a;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  /* ===== CARDS GRID ===== */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .card {
+    background: var(--parchment-dark);
+    border: 1px solid rgba(139, 105, 20, 0.25);
+    padding: 1.5rem;
+    position: relative;
+    transition: all 0.3s;
+    cursor: default;
+    opacity: 0;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .card:nth-child(1) { animation-delay: 0.1s; }
+  .card:nth-child(2) { animation-delay: 0.2s; }
+  .card:nth-child(3) { animation-delay: 0.3s; }
+  .card:nth-child(4) { animation-delay: 0.4s; }
+  .card:nth-child(5) { animation-delay: 0.5s; }
+  .card:nth-child(6) { animation-delay: 0.6s; }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 4px; left: 4px; right: -4px; bottom: -4px;
+    border: 1px solid rgba(139, 105, 20, 0.15);
+    z-index: -1;
+    transition: all 0.3s;
+  }
+
+  .card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 rgba(139, 105, 20, 0.2);
+    border-color: var(--sepia);
+  }
+
+  .card:hover::before {
+    top: 6px; left: 6px; right: -6px; bottom: -6px;
+  }
+
+  .card-icon {
+    font-size: 2rem;
+    margin-bottom: 0.8rem;
+    display: block;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-body {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: #3a2a0a;
+  }
+
+  .card-tag {
+    display: inline-block;
+    margin-top: 0.8rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sepia);
+    border-top: 1px solid rgba(139,105,20,0.3);
+    padding-top: 0.5rem;
+    width: 100%;
+  }
+
+  /* ===== FLASHCARDS ===== */
+  .flashcard-section { text-align: center; }
+
+  .progress-bar-wrap {
+    background: rgba(139,105,20,0.15);
+    border-radius: 2px;
+    height: 4px;
+    margin: 0 auto 2rem;
+    max-width: 600px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rust), var(--sepia-light));
+    transition: width 0.4s ease;
+    border-radius: 2px;
+  }
+
+  .card-counter {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--sepia);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .flashcard-container {
+    perspective: 1000px;
+    margin: 0 auto 2rem;
+    max-width: 620px;
+    height: 320px;
+    cursor: pointer;
+  }
+
+  .flashcard-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .flashcard-inner.flipped { transform: rotateY(180deg); }
+
+  .flashcard-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border: 2px solid var(--sepia);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem;
+    background: var(--parchment-dark);
+  }
+
+  .flashcard-face::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(139,105,20,0.3);
+    pointer-events: none;
+  }
+
+  .flashcard-back {
+    transform: rotateY(180deg);
+    background: var(--ink);
+  }
+
+  .flashcard-face .card-label {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--sepia);
+    margin-bottom: 1rem;
+  }
+
+  .flashcard-back .card-label { color: var(--sepia-light); }
+
+  .flashcard-face .question {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .flashcard-back .question {
+    font-size: 1.2rem;
+    color: var(--parchment);
+    font-family: 'Crimson Pro', serif;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .flip-hint {
+    font-size: 0.8rem;
+    color: var(--sepia);
+    margin-top: 1rem;
+    font-style: italic;
+  }
+
+  .flashcard-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .fc-btn {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    padding: 0.6rem 1.8rem;
+    border: 1px solid;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+    background: none;
+  }
+
+  .fc-btn.prev { border-color: var(--sepia); color: var(--sepia); }
+  .fc-btn.next { border-color: var(--rust); color: var(--rust); background: rgba(139,58,26,0.08); }
+  .fc-btn.shuffle { border-color: var(--teal); color: var(--teal); }
+
+  .fc-btn:hover { opacity: 0.75; transform: translateY(-1px); }
+
+  /* ===== QUIZ ===== */
+  .quiz-container { max-width: 700px; margin: 0 auto; }
+
+  .quiz-question-num {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    color: var(--sepia);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .quiz-question {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+    margin-bottom: 1.8rem;
+  }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 0.8rem; }
+
+  .quiz-option {
+    background: var(--parchment-dark);
+    border: 1px solid rgba(139,105,20,0.3);
+    padding: 0.9rem 1.4rem;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.05rem;
+    color: var(--ink);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .quiz-option-letter {
+    width: 28px; height: 28px;
+    border: 1px solid var(--sepia);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    color: var(--sepia);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .quiz-option:hover:not(:disabled) {
+    border-color: var(--sepia);
+    background: #dfd0a8;
+  }
+
+  .quiz-option:hover:not(:disabled) .quiz-option-letter {
+    background: var(--sepia);
+    color: var(--parchment);
+  }
+
+  .quiz-option.correct { background: #d4edda; border-color: #2d7a3a; }
+  .quiz-option.correct .quiz-option-letter { background: #2d7a3a; border-color: #2d7a3a; color: white; }
+  .quiz-option.wrong { background: #f8d7da; border-color: #842029; }
+  .quiz-option.wrong .quiz-option-letter { background: #842029; border-color: #842029; color: white; }
+  .quiz-option:disabled { cursor: default; }
+
+  .quiz-feedback {
+    margin-top: 1.2rem;
+    padding: 1rem 1.4rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    display: none;
+    border-left: 3px solid;
+    font-style: italic;
+    color: #2a1a00;
+  }
+
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct-fb { border-color: #2d7a3a; background: #f0faf2; }
+  .quiz-feedback.wrong-fb { border-color: #842029; background: #fff5f5; }
+
+  .quiz-next {
+    margin-top: 1.5rem;
+    display: none;
+    background: var(--ink);
+    color: var(--parchment);
+    border: 1px solid var(--gold);
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    padding: 0.7rem 2rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .quiz-next.show { display: inline-block; }
+  .quiz-next:hover { background: var(--rust); border-color: var(--rust-light); }
+
+  .quiz-result {
+    text-align: center;
+    padding: 3rem 1rem;
+    display: none;
+  }
+
+  .quiz-result.show { display: block; }
+
+  .result-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    font-weight: 900;
+    color: var(--rust);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-text {
+    font-size: 1.3rem;
+    color: var(--sepia);
+    font-style: italic;
+    margin-bottom: 2rem;
+  }
+
+  .restart-btn {
+    background: var(--rust);
+    color: var(--parchment);
+    border: none;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.05rem;
+    padding: 0.8rem 2.2rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.25s;
+  }
+
+  .restart-btn:hover { background: var(--rust-light); }
+
+  /* ===== QUOTES ===== */
+  .quotes-grid { display: flex; flex-direction: column; gap: 2rem; }
+
+  .quote-card {
+    background: var(--parchment-dark);
+    border-left: 4px solid var(--sepia);
+    padding: 1.8rem 2rem;
+    position: relative;
+    opacity: 0;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .quote-card:nth-child(1) { animation-delay: 0.1s; }
+  .quote-card:nth-child(2) { animation-delay: 0.2s; }
+  .quote-card:nth-child(3) { animation-delay: 0.3s; }
+  .quote-card:nth-child(4) { animation-delay: 0.4s; }
+  .quote-card:nth-child(5) { animation-delay: 0.5s; }
+
+  .quote-mark {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: rgba(139,105,20,0.2);
+    position: absolute;
+    top: -1rem;
+    left: 1rem;
+    line-height: 1;
+  }
+
+  .quote-text {
+    font-family: 'IM Fell English', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    line-height: 1.7;
+    color: var(--ink);
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1rem;
+  }
+
+  .quote-source {
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sepia);
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 600px) {
+    .hero-stats { gap: 1.5rem; }
+    .nav-btn { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
+    .flashcard-container { height: 260px; }
+    .quiz-question { font-size: 1.15rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="nav-logo">Блез Паскаль</div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showSection('hero')">Главная</button>
+    <button class="nav-btn" onclick="showSection('timeline')">Хронология</button>
+    <button class="nav-btn" onclick="showSection('discoveries')">Открытия</button>
+    <button class="nav-btn" onclick="showSection('flashcards')">Карточки</button>
+    <button class="nav-btn" onclick="showSection('quiz')">Тест</button>
+    <button class="nav-btn" onclick="showSection('quotes')">Цитаты</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div id="hero" class="hero section active">
+  <div class="hero-ornament">✦ &nbsp; &nbsp; ✦ &nbsp; &nbsp; ✦</div>
+  <div class="hero-date">19 июня 1623 — 19 августа 1662</div>
+  <h1 class="hero-title"><em>Блез</em><br>Паскаль</h1>
+  <p class="hero-subtitle">Математик · Физик · Философ · Изобретатель</p>
+  <div class="hero-divider"></div>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">39</span>
+      <span class="stat-label">лет жизни</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">12</span>
+      <span class="stat-label">лет — первое<br>открытие</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">50+</span>
+      <span class="stat-label">моделей<br>машины</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">XVIII</span>
+      <span class="stat-label">писем к<br>провинциалу</span>
+    </div>
+  </div>
+  <button class="start-btn" onclick="showSection('timeline')">
+    Начать изучение &nbsp;→
+  </button>
+</div>
+
+<!-- TIMELINE -->
+<div id="timeline" class="section">
+  <div class="section-header">
+    <span class="section-label">Жизненный путь</span>
+    <h2 class="section-title">Хронология <em>Паскаля</em></h2>
+  </div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1623</div>
+      <div class="timeline-event">Рождение в Клермоне</div>
+      <div class="timeline-desc">19 июня. Отец — Этьен Паскаль, образованный математик и чиновник. Семья отличалась выдающимися способностями.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1626</div>
+      <div class="timeline-event">Смерть матери</div>
+      <div class="timeline-desc">Антуанетта Бегон умерла, когда Блезу было три года. Единственным учителем сына стал отец — школу Паскаль никогда не посещал.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1631</div>
+      <div class="timeline-event">Переезд в Париж</div>
+      <div class="timeline-desc">Восьмилетний Паскаль попадает в интеллектуальную среду столицы. Отец намеренно скрывает от него математические книги.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1635</div>
+      <div class="timeline-event">Самостоятельное открытие геометрии</div>
+      <div class="timeline-desc">В 12 лет, без книг и учителя, заново вывел 32-ю теорему Евклида. Отец расплакался от изумления и дал сыну «Начала» Евклида.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1639</div>
+      <div class="timeline-event">Трактат о конических сечениях</div>
+      <div class="timeline-desc">В 16 лет написал трактат, включавший теорему о «мистическом шестиугольнике» — крупный вклад в проективную геометрию.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1642–1645</div>
+      <div class="timeline-event">Арифметическая машина</div>
+      <div class="timeline-desc">Изобрёл механический вычислитель в 18 лет. Испробовал более 50 моделей. Финальный экземпляр хранится в Парижской консерватории.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1648</div>
+      <div class="timeline-event">Опыты на горе Пюи-де-Дом</div>
+      <div class="timeline-desc">Зять Перье доказал, что давление ртути уменьшается с высотой. Паскаль сформулировал закон распределения давления жидкостей.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1654</div>
+      <div class="timeline-event">Теория вероятностей и «Ночь огня»</div>
+      <div class="timeline-desc">Переписка с Ферма — рождение теории вероятностей. В ноябре — мистическое «обращение»; написал исповедь, которую носил зашитой в одежде.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1656–1657</div>
+      <div class="timeline-event">«Письма к провинциалу»</div>
+      <div class="timeline-desc">XVIII памфлетов против иезуитской морали под псевдонимом Луи де Монтальт. Сожжены по королевскому приказу — и стали шедевром французской прозы.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1658</div>
+      <div class="timeline-event">Открытие о циклоиде</div>
+      <div class="timeline-desc">Мучаясь зубной болью ночью, начал думать о свойствах циклоиды — и за 8 дней написал трактат, вплотную подойдя к дифференциальному исчислению.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1662</div>
+      <div class="timeline-event">Смерть в Париже</div>
+      <div class="timeline-desc">19 августа, в возрасте 39 лет. Последние слова: «Пусть Бог никогда меня не оставляет». Вскрытие показало: мозг был необычно велик и тяжёл.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DISCOVERIES -->
+<div id="discoveries" class="section">
+  <div class="section-header">
+    <span class="section-label">Вклад в науку</span>
+    <h2 class="section-title">Открытия и <em>изобретения</em></h2>
+  </div>
+  <div class="cards-grid">
+    <div class="card">
+      <span class="card-icon">📐</span>
+      <div class="card-title">Геометрия (12 лет)</div>
+      <div class="card-body">Самостоятельно вывел свойства треугольника и дошёл до 32-й теоремы Евклида — без учителя, называя прямые «палками», а окружности «кольцами».</div>
+      <span class="card-tag">Геометрия · 1635</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">🔢</span>
+      <div class="card-title">Арифметическая машина</div>
+      <div class="card-body">Первый механический вычислитель — прообраз компьютера. 3 года работы, 50+ моделей. Доказал, что умственный труд поддаётся механизации.</div>
+      <span class="card-tag">Механика · 1642–1645</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">🌡️</span>
+      <div class="card-title">Закон Паскаля (гидростатика)</div>
+      <div class="card-body">Давление жидкости распространяется равномерно во все стороны. Из этого вытекает принцип гидравлического пресса — многократное усиление силы.</div>
+      <span class="card-tag">Физика · 1648</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">🏔️</span>
+      <div class="card-title">Барометрические опыты</div>
+      <div class="card-body">Опыт на горе Пюи-де-Дом: ртуть опускалась при подъёме. Доказательство, что атмосферное давление уменьшается с высотой. Начало метеорологии.</div>
+      <span class="card-tag">Физика · 1648</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">🎲</span>
+      <div class="card-title">Теория вероятностей</div>
+      <div class="card-body">Совместно с Ферма решил задачу о разделе ставки. Впервые доказал, что «вероятность» — измеримая математическая величина. Основа статистики и страхования.</div>
+      <span class="card-tag">Математика · 1654</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">🔺</span>
+      <div class="card-title">Арифметический треугольник</div>
+      <div class="card-body">Числовой треугольник для вычисления сочетаний. Содержит бином Ньютона (открытый Паскалем раньше Ньютона), треугольные и пирамидальные числа.</div>
+      <span class="card-tag">Математика · 1654</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">⚙️</span>
+      <div class="card-title">Предчувствие дифференциального исчисления</div>
+      <div class="card-body">Исследуя циклоиду, Паскаль вплотную подошёл к понятию производной. Честь открытия досталась Ньютону и Лейбницу — Паскаль не успел.</div>
+      <span class="card-tag">Математика · 1658</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">🚌</span>
+      <div class="card-title">Первый омнибус Парижа</div>
+      <div class="card-body">Организовал первую в Европе систему общественного транспорта — «пятикопеечные кареты» по фиксированным маршрутам. Доход шёл голодающим.</div>
+      <span class="card-tag">Инженерия · 1662</span>
+    </div>
+  </div>
+</div>
+
+<!-- FLASHCARDS -->
+<div id="flashcards" class="section flashcard-section">
+  <div class="section-header">
+    <span class="section-label">Запоминание</span>
+    <h2 class="section-title">Карточки для <em>повторения</em></h2>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="fc-progress" style="width:0%"></div>
+  </div>
+  <div class="card-counter" id="fc-counter">Карточка 1 из 10</div>
+  <div class="flashcard-container" onclick="flipCard()">
+    <div class="flashcard-inner" id="flashcard">
+      <div class="flashcard-face">
+        <span class="card-label">Вопрос</span>
+        <div class="question" id="fc-question">Загрузка...</div>
+        <div class="flip-hint">← нажмите, чтобы увидеть ответ →</div>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <span class="card-label">Ответ</span>
+        <div class="question" id="fc-answer"></div>
+      </div>
+    </div>
+  </div>
+  <div class="flashcard-controls">
+    <button class="fc-btn prev" onclick="prevCard()">← Назад</button>
+    <button class="fc-btn shuffle" onclick="shuffleCards()">⇄ Перемешать</button>
+    <button class="fc-btn next" onclick="nextCard()">Вперёд →</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="section">
+  <div class="section-header">
+    <span class="section-label">Проверка знаний</span>
+    <h2 class="section-title">Тест по <em>биографии</em></h2>
+  </div>
+  <div class="progress-bar-wrap" style="max-width:700px">
+    <div class="progress-bar-fill" id="quiz-progress" style="width:0%"></div>
+  </div>
+  <div class="quiz-container">
+    <div id="quiz-body">
+      <div class="quiz-question-num" id="q-num">Вопрос 1 из 12</div>
+      <div class="quiz-question" id="q-text"></div>
+      <div class="quiz-options" id="q-options"></div>
+      <div class="quiz-feedback" id="q-feedback"></div>
+      <button class="quiz-next" id="q-next" onclick="nextQuestion()">Следующий вопрос →</button>
+    </div>
+    <div class="quiz-result" id="quiz-result">
+      <span class="result-score" id="result-score"></span>
+      <div class="result-text" id="result-text"></div>
+      <button class="restart-btn" onclick="restartQuiz()">Пройти ещё раз</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTES -->
+<div id="quotes" class="section">
+  <div class="section-header">
+    <span class="section-label">Мудрость</span>
+    <h2 class="section-title">Мысли <em>Паскаля</em></h2>
+  </div>
+  <div class="quotes-grid">
+    <div class="quote-card">
+      <div class="quote-mark">"</div>
+      <div class="quote-text">Человек — всего лишь мыслящий тростник, самое слабое в природе существо, но это мыслящий тростник. Чтобы его уничтожить, не нужна вся вселенная: достаточно капли воды. Но если бы даже вселенная его уничтожила, человек был бы всё равно величественнее своего убийцы, потому что он знает, что умирает, тогда как вселенная ничего не знает о своём превосходстве над ним.</div>
+      <div class="quote-source">«Мысли» (Pensées)</div>
+    </div>
+    <div class="quote-card">
+      <div class="quote-mark">"</div>
+      <div class="quote-text">Всё несчастье людей происходит от одной причины — они не умеют спокойно сидеть в комнате.</div>
+      <div class="quote-source">«Мысли»</div>
+    </div>
+    <div class="quote-card">
+      <div class="quote-mark">"</div>
+      <div class="quote-text">Что такое человек в природе? Ничто по сравнению с бесконечным и всё по сравнению с ничтожно малым. Среднее между ничем и всем.</div>
+      <div class="quote-source">«Мысли»</div>
+    </div>
+    <div class="quote-card">
+      <div class="quote-mark">"</div>
+      <div class="quote-text">Вселенная — это бесконечный шар, центр которого везде, а поверхность — нигде.</div>
+      <div class="quote-source">«Мысли»</div>
+    </div>
+    <div class="quote-card">
+      <div class="quote-mark">"</div>
+      <div class="quote-text">Истина без любви — ложь.</div>
+      <div class="quote-source">«Мысли»</div>
+    </div>
+    <div class="quote-card">
+      <div class="quote-mark">"</div>
+      <div class="quote-text">Три градуса широты опрокидывают всю юриспруденцию; меридиан решает сущность истины. Хороша справедливость, ограниченная рекой! Истина по эту сторону Пиренеев, ложь — по ту.</div>
+      <div class="quote-source">«Мысли»</div>
+    </div>
+    <div class="quote-card">
+      <div class="quote-mark">"</div>
+      <div class="quote-text">Я не могу простить Декарту: признавая Бога, он в то же время прекрасно обходился без Него. Декарт призвал Бога лишь для того, чтобы дать толчок миру, а потом спрятал Его неизвестно куда.</div>
+      <div class="quote-source">«Мысли»</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== NAVIGATION =====
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const idx = ['hero','timeline','discoveries','flashcards','quiz','quotes'].indexOf(id);
+  document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+
+  if (id === 'flashcards') initFlashcards();
+  if (id === 'quiz') initQuiz();
+}
+
+// ===== FLASHCARDS =====
+const flashcardsData = [
+  { q: "Когда и где родился Блез Паскаль?", a: "19 июня 1623 года в Клермоне (Франция). Умер 19 августа 1662 года в Париже — прожил всего 39 лет." },
+  { q: "В каком возрасте Паскаль самостоятельно заново открыл геометрию?", a: "В 12 лет. Без книг и учителя дошёл до 32-й теоремы Евклида — о том, что сумма углов треугольника равна двум прямым." },
+  { q: "Что такое арифметическая машина Паскаля и когда она была создана?", a: "Механический вычислитель — прообраз компьютера. Создан в 1642–1645 годах. Паскаль испробовал более 50 моделей. Хранится в Парижской консерватории." },
+  { q: "В чём суть закона Паскаля?", a: "Давление, производимое на жидкость в замкнутом сосуде, передаётся во всех направлениях одинаково. Это основа гидравлического пресса." },
+  { q: "Что доказали опыты на горе Пюи-де-Дом в 1648 году?", a: "Атмосферное давление уменьшается с высотой. Зять Паскаля Перье поднялся на гору с барометром — ртуть упала. Это опровергло теорию 'боязни пустоты'." },
+  { q: "Как родилась теория вероятностей и кто был её соавтором?", a: "В 1654 году. Азартный игрок де Мере спросил Паскаля, как делить ставку в незаконченной игре. Паскаль и математик Ферма независимо решили задачу." },
+  { q: "Что такое арифметический треугольник Паскаля?", a: "Числовой треугольник, где каждое число — сумма двух стоящих над ним. Содержит треугольные и пирамидальные числа, а также формулу бинома Ньютона." },
+  { q: "Какое открытие Паскаль сделал, мучаясь от зубной боли?", a: "Исследование о циклоиде (кривая, которую описывает точка катящегося колеса). Написал трактат за 8 дней, вплотную подойдя к дифференциальному исчислению." },
+  { q: "Что такое «Письма к провинциалу» и под каким псевдонимом они были написаны?", a: "XVIII памфлетов против иезуитской морали (1656–1657). Написаны под псевдонимом Луи де Монтальт. Сожжены по королевскому указу, стали шедевром французской прозы." },
+  { q: "Какое социальное изобретение Паскаль создал за несколько месяцев до смерти?", a: "В 1662 году организовал первую в Европе систему общественного транспорта — «пятикопеечные кареты» (омнибусы) по фиксированным маршрутам Парижа." },
+];
+
+let fcIndex = 0;
+let fcOrder = [];
+let fcFlipped = false;
+
+function initFlashcards() {
+  fcOrder = [...Array(flashcardsData.length).keys()];
+  fcIndex = 0;
+  fcFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  updateFlashcard();
+}
+
+function updateFlashcard() {
+  const card = flashcardsData[fcOrder[fcIndex]];
+  document.getElementById('fc-question').textContent = card.q;
+  document.getElementById('fc-answer').textContent = card.a;
+  document.getElementById('fc-counter').textContent = `Карточка ${fcIndex + 1} из ${flashcardsData.length}`;
+  document.getElementById('fc-progress').style.width = `${((fcIndex + 1) / flashcardsData.length) * 100}%`;
+  fcFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function flipCard() {
+  fcFlipped = !fcFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped', fcFlipped);
+}
+
+function nextCard() {
+  fcIndex = (fcIndex + 1) % flashcardsData.length;
+  updateFlashcard();
+}
+
+function prevCard() {
+  fcIndex = (fcIndex - 1 + flashcardsData.length) % flashcardsData.length;
+  updateFlashcard();
+}
+
+function shuffleCards() {
+  for (let i = fcOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [fcOrder[i], fcOrder[j]] = [fcOrder[j], fcOrder[i]];
+  }
+  fcIndex = 0;
+  updateFlashcard();
+}
+
+// ===== QUIZ =====
+const quizData = [
+  {
+    q: "В каком году родился Блез Паскаль?",
+    opts: ["1612", "1623", "1635", "1642"],
+    correct: 1,
+    explain: "Паскаль родился 19 июня 1623 года в Клермоне (Франция)."
+  },
+  {
+    q: "В каком возрасте Паскаль самостоятельно заново вывел теорему Евклида о сумме углов треугольника?",
+    opts: ["8 лет", "10 лет", "12 лет", "16 лет"],
+    correct: 2,
+    explain: "В 12 лет, без книг и учителя, он дошёл до 32-й теоремы первой книги Евклида."
+  },
+  {
+    q: "Сколько моделей арифметической машины испробовал Паскаль?",
+    opts: ["Около 10", "Около 20", "Около 30", "Более 50"],
+    correct: 3,
+    explain: "Паскаль работал над машиной три года и испробовал более 50 различных моделей."
+  },
+  {
+    q: "Кто помог Паскалю провести барометрические опыты на горе Пюи-де-Дом?",
+    opts: ["Ферма", "Декарт", "Зять Перье", "Торричелли"],
+    correct: 2,
+    explain: "Паскаль организовал опыт, а 19 сентября 1648 года его зять Перье поднялся на гору с барометром."
+  },
+  {
+    q: "Кто подтолкнул Паскаля к созданию теории вероятностей?",
+    opts: ["Декарт", "Кавалер де Мере", "Герцог Роанез", "Монтень"],
+    correct: 1,
+    explain: "Азартный игрок кавалер де Мере спросил, как справедливо делить ставку в незаконченной игре — так родилась теория вероятностей."
+  },
+  {
+    q: "Под каким псевдонимом написаны «Письма к провинциалу»?",
+    opts: ["Жан Буало", "Луи де Монтальт", "Пьер Лепети", "Арно Клервоский"],
+    correct: 1,
+    explain: "Письма были опубликованы под псевдонимом Луи де Монтальт — никто не догадывался, что автор это Паскаль."
+  },
+  {
+    q: "Какое математическое открытие Паскаль сделал, спасаясь от зубной боли?",
+    opts: ["Теорему Пифагора", "Свойства циклоиды", "Бином Ньютона", "Формулу площади круга"],
+    correct: 1,
+    explain: "Не имея сил спать, Паскаль стал думать о циклоиде и за 8 дней написал трактат, вплотную подойдя к дифференциальному исчислению."
+  },
+  {
+    q: "Что организовал Паскаль в Париже незадолго до смерти?",
+    opts: ["Академию наук", "Систему омнибусов", "Первую больницу", "Янсенистскую школу"],
+    correct: 1,
+    explain: "В январе 1662 года под руководством Паскаля заработала первая в Европе система общественного транспорта — «пятикопеечные кареты»."
+  },
+  {
+    q: "К какому религиозному движению примкнул Паскаль в последние годы жизни?",
+    opts: ["Иезуиты", "Кальвинисты", "Янсенисты", "Доминиканцы"],
+    correct: 2,
+    explain: "Паскаль стал одним из главных борцов янсенистского движения и жил при общине Пор-Рояль."
+  },
+  {
+    q: "Сколько лет прожил Блез Паскаль?",
+    opts: ["33 года", "36 лет", "39 лет", "42 года"],
+    correct: 2,
+    explain: "Паскаль родился 19 июня 1623 года и умер 19 августа 1662 года — прожил 39 лет."
+  },
+  {
+    q: "Что обнаружило вскрытие тела Паскаля?",
+    opts: ["Следы отравления", "Необычно большой и тяжёлый мозг", "Болезнь лёгких", "Повреждения сердца"],
+    correct: 1,
+    explain: "Мозг Паскаля был чрезвычайно велик, тяжёл и плотен. Череп почти без швов — вероятная причина хронических головных болей."
+  },
+  {
+    q: "Что Паскаль носил под одеждой, чтобы бороться с тщеславием?",
+    opts: ["Деревянный крест", "Железный пояс с остриями", "Четвертинку Библии", "Записку-исповедь"],
+    correct: 1,
+    explain: "Паскаль носил железный пояс с шипами: когда приходила 'праздная' мысль, он нажимал локтями — острия вонзались в тело."
+  },
+];
+
+let qIndex = 0;
+let qScore = 0;
+let qShuffled = [];
+let qAnswered = false;
+
+function initQuiz() {
+  qShuffled = [...quizData].sort(() => Math.random() - 0.5);
+  qIndex = 0;
+  qScore = 0;
+  qAnswered = false;
+  document.getElementById('quiz-result').classList.remove('show');
+  document.getElementById('quiz-body').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = qShuffled[qIndex];
+  document.getElementById('q-num').textContent = `Вопрос ${qIndex + 1} из ${qShuffled.length}`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('quiz-progress').style.width = `${(qIndex / qShuffled.length) * 100}%`;
+
+  const letters = ['А', 'Б', 'В', 'Г'];
+  const optsEl = document.getElementById('q-options');
+  optsEl.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.innerHTML = `<span class="quiz-option-letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    optsEl.appendChild(btn);
+  });
+
+  const fb = document.getElementById('q-feedback');
+  fb.className = 'quiz-feedback';
+  fb.textContent = '';
+  document.getElementById('q-next').className = 'quiz-next';
+  qAnswered = false;
+}
+
+function selectAnswer(i) {
+  if (qAnswered) return;
+  qAnswered = true;
+  const q = qShuffled[qIndex];
+  const opts = document.querySelectorAll('.quiz-option');
+  opts.forEach(o => o.disabled = true);
+
+  const fb = document.getElementById('q-feedback');
+  if (i === q.correct) {
+    qScore++;
+    opts[i].classList.add('correct');
+    fb.textContent = '✓ Верно! ' + q.explain;
+    fb.className = 'quiz-feedback correct-fb show';
+  } else {
+    opts[i].classList.add('wrong');
+    opts[q.correct].classList.add('correct');
+    fb.textContent = '✗ Неверно. ' + q.explain;
+    fb.className = 'quiz-feedback wrong-fb show';
+  }
+
+  const nextBtn = document.getElementById('q-next');
+  nextBtn.textContent = qIndex < qShuffled.length - 1 ? 'Следующий вопрос →' : 'Посмотреть результат →';
+  nextBtn.className = 'quiz-next show';
+}
+
+function nextQuestion() {
+  qIndex++;
+  if (qIndex >= qShuffled.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz-body').style.display = 'none';
+  document.getElementById('quiz-progress').style.width = '100%';
+  const pct = Math.round((qScore / qShuffled.length) * 100);
+  document.getElementById('result-score').textContent = `${qScore} / ${qShuffled.length}`;
+  const texts = [
+    [0, 40, "Паскаль сказал бы: «Надо работать над собой». Попробуйте ещё раз!"],
+    [40, 70, "Неплохое начало! Повторите карточки и попробуйте снова."],
+    [70, 90, "Хороший результат! Вы хорошо знаете биографию Паскаля."],
+    [90, 101, "Блестяще! Вы знаете Паскаля не хуже, чем он сам себя."]
+  ];
+  const t = texts.find(([lo, hi]) => pct >= lo && pct < hi);
+  document.getElementById('result-text').textContent = t[2];
+  document.getElementById('quiz-result').classList.add('show');
+}
+
+function restartQuiz() {
+  initQuiz();
+}
+
+// Init flashcards on page load if needed
+initFlashcards();
+</script>
+</body>
+</html>
